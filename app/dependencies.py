@@ -1,12 +1,14 @@
 from sqlalchemy.orm import sessionmaker, Session
 from fastapi import Depends, HTTPException
-from app.models import db
-from app.models import User
+from app.models import db, User
 from jose import jwt, JWTError
 from app.auth import SECRET_KEY, ALGORITHM
 from fastapi.security import OAuth2PasswordBearer
 
+
 aouth2_schema = OAuth2PasswordBearer(tokenUrl="auth/login-form")
+
+
 
 def get_session():
 

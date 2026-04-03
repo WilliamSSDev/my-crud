@@ -6,9 +6,11 @@ from app.models import User
 from app.auth import authenticate_user, create_token, bcrypt_context
 from sqlalchemy.orm import Session
 from datetime import timedelta
+from app.utils import limiter
 
 auth_route = APIRouter(prefix="/auth", tags=["auth"])
 
+@limiter.limit("5/minute")
 @auth_route.post('/register', response_model=UserResponse)
 async def register(usuario: UserRegister, session: Session = Depends(get_session)):
     
@@ -23,8 +25,12 @@ async def register(usuario: UserRegister, session: Session = Depends(get_session
     session.commit()
     return novo_usuario
 
+
 @auth_route.post("/login")
-async def login(response: Response, usuario: UserLogin, session: Session = Depends(get_session)):
+@limiter.limit("5/minute")
+async def login(request: Request, response: Response, usuario: UserLogin, session: Session = Depends(get_session)):
+
+    print(request.client.host)
 
     usuario = authenticate_user(usuario.email, usuario.password, session)
 
@@ -58,8 +64,9 @@ async def login_form(user: OAuth2PasswordRequestForm = Depends(), session: Sessi
     
     return {"access_token": bearer_token, "refresh_token": refresh_token, "token_type": 'Bearer '}
 
+@limiter.limit("5/minute")
 @auth_route.post(path="/refresh")
-def use_refresh_token(usuario: User = Depends(verify_token)):
+async def use_refresh_token(usuario: User = Depends(verify_token)):
 
     # Get user ID
     user_id = usuario.id
@@ -72,7 +79,7 @@ def use_refresh_token(usuario: User = Depends(verify_token)):
     }
 
 @auth_route.post("/protected")
-def protected(request: Request):
+async def protected(request: Request):
     token = request.cookies.get("access_token")
 
     if not token:

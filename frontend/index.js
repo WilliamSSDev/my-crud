@@ -32,9 +32,9 @@ async function handleLogin(event){
         window.location.href = "login_page.html";
     } else {
         
-        let detail = data['detail']
-        console.log(detail)
-        message.textContent = detail
+        // let detail = data['detail']
+        console.log(response.status)
+        message.textContent = response.status
     }
 
     
