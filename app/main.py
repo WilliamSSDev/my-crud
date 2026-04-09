@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from app.routes.auth import auth_route
+from app.routes.user import user_route
 from fastapi.middleware.cors import CORSMiddleware
 from app.utils import limiter
 
@@ -14,6 +15,7 @@ app.add_middleware(
 )
 
 app.include_router(auth_route)
+app.include_router(user_route)
 
 app.state.limiter = limiter
 

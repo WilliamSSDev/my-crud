@@ -12,7 +12,7 @@ auth_route = APIRouter(prefix="/auth", tags=["auth"])
 
 @limiter.limit("5/minute")
 @auth_route.post('/register', response_model=UserResponse)
-async def register(usuario: UserRegister, session: Session = Depends(get_session)):
+async def register(request: Request, usuario: UserRegister, session: Session = Depends(get_session)):
     
     has_user = session.query(User).filter(User.email==usuario.email).first()
 
@@ -20,7 +20,7 @@ async def register(usuario: UserRegister, session: Session = Depends(get_session
         raise HTTPException(status_code=400, detail="User already registered.")
     
     senha_criptografada = bcrypt_context.hash(usuario.password)
-    novo_usuario = User(name=usuario.name, email=usuario.email, password=senha_criptografada)
+    novo_usuario = User(name=usuario.name, email=usuario.email, password=senha_criptografada, admin=False)
     session.add(novo_usuario)
     session.commit()
     return novo_usuario
@@ -66,7 +66,7 @@ async def login_form(user: OAuth2PasswordRequestForm = Depends(), session: Sessi
 
 @limiter.limit("5/minute")
 @auth_route.post(path="/refresh")
-async def use_refresh_token(usuario: User = Depends(verify_token)):
+async def use_refresh_token(request: Request, usuario: User = Depends(verify_token)):
 
     # Get user ID
     user_id = usuario.id
@@ -86,5 +86,3 @@ async def protected(request: Request):
         return {"error": "not authenticated"}
 
     return {"message": "you are authenticated"}
-
-

@@ -1,7 +1,7 @@
 body {
     margin: 0;
     font-family: Arial;
-    background: #f4f6f8;
+    background: #347bc7;
 }
 
 .dashboard {
@@ -11,22 +11,36 @@ body {
 .header {
     display: flex;
     justify-content: space-between;
-    background: #1e293b;
+    background: #347bc7;
     color: white;
     padding: 15px;
     border-radius: 10px;
 }
 
 .content {
-    margin-top: 20px;
     display: flex;
-    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 80px); /* adjust based on header height */
 }
 
 .card {
-    background: white;
-    padding: 20px;
+    width: 400px;
+    padding: 30px;
+    background-color: #ffffff;
     border-radius: 10px;
-    flex: 1;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+ul {
+    display: flex;
+    gap: 20px;
+    list-style: none;
+}
+a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+}
+a i {
+    margin-right: 8px;
 }

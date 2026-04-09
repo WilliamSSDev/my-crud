@@ -5,10 +5,7 @@ from jose import jwt, JWTError
 from app.auth import SECRET_KEY, ALGORITHM
 from fastapi.security import OAuth2PasswordBearer
 
-
 aouth2_schema = OAuth2PasswordBearer(tokenUrl="auth/login-form")
-
-
 
 def get_session():
 

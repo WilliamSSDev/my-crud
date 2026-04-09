@@ -1,0 +1,17 @@
+.input-group {
+    display: flex;
+    align-items: center;
+    border-bottom: 2px solid #4b6f9c;
+    margin-bottom: 20px;
+    padding: 5px 0;
+    background: transparent;
+}
+
+.input-group input{
+    background: transparent;
+    color: white;
+    border: transparent;
+    padding: 10px;
+    margin-left: 10px;
+    padding-right: 100px;
+}

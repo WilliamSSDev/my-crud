@@ -30,11 +30,15 @@ async function handleLogin(event){
         message.textContent = 'You are logged in';
 
         window.location.href = "login_page.html";
+
+        alert("Login successful")
     } else {
         
         // let detail = data['detail']
         console.log(response.status)
         message.textContent = response.status
+
+        alert("Invalid credentials")
     }
 
     

@@ -17,7 +17,7 @@
 
         .container {
             background-color: #1e293b;
-            padding: 30px;
+            padding: 70px;
             border-radius: 10px;
             width: 300px;
             box-shadow: 0 0 15px rgba(0,0,0,0.5);
@@ -27,23 +27,29 @@
             text-align: center;
         }
 
-        input {
+        /* input {
             width: 100%;
             padding: 10px;
             margin-top: 5px;
             margin-bottom: 15px;
             border: none;
-            border-radius: 5px;
-        }
+            border-radius: 0px;
+            background: transparent;
+            flex: 1;
+            outline: none;
+            color: aliceblue;
+            border-bottom: 2px solid #4b6f9c;
+        } */
 
         button {
-            width: 100%;
+            width: 320px;
             padding: 10px;
             background-color: #3b82f6;
             border: none;
             border-radius: 5px;
             color: white;
             cursor: pointer;
+            margin-top: 30px;
         }
 
         button:hover {
@@ -59,18 +65,27 @@
 
 <body>
 
+    
+
     <div class="container">
         <h2>Login</h2>
 
         <form onsubmit="handleLogin(event)">
 
-            <label for="username">Username</label>
-            <input type="text" id="fusername" placeholder="Enter username" required>
+            <div class="input-group">
+                <i class="fa-solid fa-envelope"></i>
+                <input type="text" id="fusername" placeholder="Enter username" required>
+            </div>
 
-            <label for="password">Password</label>
-            <input type="password" id="fpassword" placeholder="Enter password" required>
+            <div class="input-group">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" id="fpassword" placeholder="Enter password" required>
+            </div>
 
-            <button type="submit" id="loginBtn">Login</button>
+            <div class="submit-group">
+                <button type="submit">Login</button>
+            </div>
+
 
         </form>
         <p id="message"></p>
@@ -78,6 +93,9 @@
 
     <script src="index.js">
     </script>
+
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 </body>
 </html>
