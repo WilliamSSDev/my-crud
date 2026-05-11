@@ -1,5 +1,5 @@
 from sqlalchemy.orm import sessionmaker, Session
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, Cookie
 from app.models import db, User
 from jose import jwt, JWTError
 from app.auth import SECRET_KEY, ALGORITHM
@@ -18,9 +18,9 @@ def get_session():
     finally:
         session.close()
 
-def verify_token(token: str = Depends(aouth2_schema), session: Session = Depends(get_session)):
+def verify_token(access_token = Cookie(None), session: Session = Depends(get_session)):
     try:
-        dict_info = jwt.decode(token, SECRET_KEY, ALGORITHM)
+        dict_info = jwt.decode(access_token, SECRET_KEY, ALGORITHM)
         user_id = int(dict_info.get('sub'))
         
     except JWTError:

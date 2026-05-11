@@ -43,3 +43,17 @@ async function handleLogin(event){
 
     
 }
+
+
+const addCardButton =
+    document.getElementById("open-add-card")
+
+const addCardSection =
+    document.getElementById("add-card-section")
+
+
+addCardButton.addEventListener("click", () => {
+
+    addCardSection.style.display = "block"
+
+})

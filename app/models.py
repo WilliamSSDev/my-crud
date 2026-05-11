@@ -1,10 +1,32 @@
 from sqlalchemy import create_engine, Column, String, Integer, Boolean, Float, ForeignKey
-from sqlalchemy.orm import declarative_base, sessionmaker
-from sqlalchemy import DateTime
+from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy import DateTime, Enum as SqlEnum
+from datetime import datetime, timezone
+from enum import Enum
+
+from datetime import timedelta, datetime
 
 db = create_engine("sqlite:///banco.db")
 
 Base = declarative_base()
+
+class Difficulty(str, Enum):
+    EASY = "easy"
+    MEDIUM = "medium"
+    HARD = "hard"
+
+def get_next_review(difficulty: Difficulty):
+
+    now = datetime.now(timezone.utc)
+
+    if difficulty == Difficulty.EASY:
+        return now + timedelta(days=4)
+
+    elif difficulty == Difficulty.MEDIUM:
+        return now + timedelta(days=1)
+
+    elif difficulty == Difficulty.HARD:
+        return now
 
 class User(Base):
 
@@ -17,6 +39,8 @@ class User(Base):
     admin = Column("admin", Boolean, default=False)
     deleted_at = Column(DateTime, nullable=True)
 
+    cards = relationship("Card", back_populates='user')
+
 
     def __init__(self, name, email, password, admin=False):
 
@@ -25,11 +49,30 @@ class User(Base):
         self.password = password
         self.admin = admin
 
-    # class Config:
-    #     from_attributes = True
+    class Config:
+        from_attributes = True
+
+class Card(Base):
+
+    __tablename__ = 'cards'
+
+    id = Column("id", Integer, nullable=False, autoincrement=True, primary_key=True)
+    front_content = Column("front_content", String, nullable=False)
+    back_content = Column("back", String, nullable=False)
+    created_at = Column("created_at", DateTime, default=lambda: datetime.now(timezone.utc))
+    next_review = Column("next_review", DateTime, nullable=False)
+    last_reviewed = Column("last_reviewed", DateTime, nullable=False)
+    difficulty = Column("difficulty", SqlEnum(Difficulty), nullable=False)
+    interval = Column("interval", Integer, nullable=False)
+    review_count = Column("review_count", Integer, default=0)
+
+    user_id = Column(Integer, ForeignKey("usuarios.id"))
+
+    user = relationship('User', back_populates='cards')
 
 if __name__ == '__main__':
 
+    # Base.metadata.drop_all(bind=db)
     Base.metadata.create_all(bind=db)
 
 

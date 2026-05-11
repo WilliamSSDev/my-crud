@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr
+from datetime import datetime
 
 class UserRegister(BaseModel):
 
@@ -15,3 +16,9 @@ class UserLogin(BaseModel):
 
     email: str
     password: str
+
+class Card(BaseModel):
+
+    front_content: str
+    back_content: str
+
