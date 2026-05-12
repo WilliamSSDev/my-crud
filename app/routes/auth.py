@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Response, Request
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.responses import JSONResponse
 from app.dependencies import get_session, verify_token
 from app.schemas import UserRegister, UserResponse, UserLogin
 from app.models import User
@@ -47,6 +48,11 @@ async def login(request: Request, response: Response, usuario: UserLogin, sessio
     bearer_token = create_token(usuario.id)
     refresh_token = create_token(usuario.id, timedelta(days=7))
 
+    response = JSONResponse(
+        content={
+            "message": "Login successful"
+        }
+    )
     response.set_cookie(
         key="access_token",
         value=bearer_token,
@@ -56,7 +62,7 @@ async def login(request: Request, response: Response, usuario: UserLogin, sessio
         path="/"
     )
 
-    return {"access_token": bearer_token, "refresh_token": refresh_token, "token_type": 'Bearer '}
+    return response
 
 @auth_route.post("/login-form")
 async def login_form(response: Response, user: OAuth2PasswordRequestForm = Depends(), session: Session = Depends(get_session)):
@@ -124,9 +130,9 @@ async def use_refresh_token(response: Response, request: Request, session = Depe
 async def protected(request: Request):
     token = request.cookies.get("access_token")
 
-    print(token)
+    # print(token)
 
     if not token:
-        return {"error": "not authenticated"}
+        return {"error": "not authenticated", "authenticated": False}
 
-    return {"message": "you are authenticated"}
+    return {"message": "you are authenticated", "authenticated": True}

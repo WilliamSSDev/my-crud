@@ -1,35 +1,214 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Login - StudyCards</title>
+
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body{
+            background-color: #0f172a;
+            height: 100vh;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-container{
+            background-color: #1e293b;
+
+            width: 400px;
+
+            padding: 40px;
+
+            border-radius: 20px;
+
+            box-shadow: 0px 0px 20px rgba(0,0,0,0.3);
+        }
+
+        .login-container h1{
+            color: white;
+
+            text-align: center;
+
+            margin-bottom: 30px;
+        }
+
+        .input-group{
+            display: flex;
+            flex-direction: column;
+
+            margin-bottom: 20px;
+        }
+
+        .input-group label{
+            color: #cbd5e1;
+
+            margin-bottom: 8px;
+        }
+
+        .input-group input{
+            padding: 14px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            background-color: #334155;
+
+            color: white;
+
+            outline: none;
+        }
+
+        .input-group input::placeholder{
+            color: #94a3b8;
+        }
+
+        .login-button{
+            width: 100%;
+
+            padding: 14px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            background-color: #3b82f6;
+
+            color: white;
+
+            font-size: 16px;
+
+            cursor: pointer;
+
+            transition: 0.3s;
+        }
+
+        .login-button:hover{
+            opacity: 0.8;
+        }
+
+        .error-message{
+            color: #ef4444;
+
+            margin-top: 15px;
+
+            text-align: center;
+        }
+
+    </style>
+
 </head>
+
 <body>
-    <div class="dashboard">
 
-        <header class="header">
-            <nav>
-                <ul>
-                    <li><a href="#"><i class="fa-solid fa-house"></i> Início</a></li>
-                    <li><a href="#"><i class="fa-solid fa-layer-group"></i> Meus Decks</a></li>
-                    <li><a href="#"><i class="fa-solid fa-chart-line"></i> Estatísticas</a></li>
-                </ul>
-            </nav>
+    <div class="login-container">
 
+        <h1>
+            <i class="fa-solid fa-graduation-cap"></i>
+            StudyCards
+        </h1>
 
-            <span id="user-info">Loading...</span>
-        </header>
+        <form id="login-form">
 
-        <main class="content">
-            <div class="card">
-                <h1>Adicionar cartão <i class="fa-solid fa-plus"></i>
+            <div class="input-group">
+
+                <label>Email</label>
+
+                <input
+                type="email"
+                id="email"
+                placeholder="Digite seu email"
+                required>
+
             </div>
-        </main>
+
+            <div class="input-group">
+
+                <label>Senha</label>
+
+                <input
+                type="password"
+                id="password"
+                placeholder="Digite sua senha"
+                required>
+
+            </div>
+
+            <button
+            type="submit"
+            class="login-button">
+
+                Entrar
+
+            </button>
+
+            <p class="error-message" id="error-message"></p>
+
+        </form>
 
     </div>
 
-    <link rel="stylesheet" href="login_page.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script>
+
+    const loginForm = document.getElementById("login-form")
+
+    loginForm.addEventListener("submit", async function(event){
+
+        event.preventDefault()
+
+        const email = document.getElementById("email").value
+
+        const password = document.getElementById("password").value
+
+        const response = await fetch(
+            "http://localhost:8000/auth/login",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                credentials: "include",
+
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                })
+            }
+        )
+
+        const data = await response.json()
+
+        if(response.ok){
+
+            window.location.href = "index.html"
+            // console.log("IT WORKED.")
+
+        }else{
+
+            document.getElementById("error-message").innerText =
+            data.detail || "Erro ao fazer login"
+
+        }
+
+    })
+
+</script>
+
 </body>
 </html>

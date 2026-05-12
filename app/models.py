@@ -23,7 +23,7 @@ def get_next_review(difficulty: Difficulty):
         return now + timedelta(days=4)
 
     elif difficulty == Difficulty.MEDIUM:
-        return now + timedelta(days=1)
+        return now + timedelta(seconds=10)
 
     elif difficulty == Difficulty.HARD:
         return now
@@ -38,9 +38,9 @@ class User(Base):
     password = Column("password", String)
     admin = Column("admin", Boolean, default=False)
     deleted_at = Column(DateTime, nullable=True)
+    current_streak = Column(Integer, default=0)
 
     cards = relationship("Card", back_populates='user')
-
 
     def __init__(self, name, email, password, admin=False):
 

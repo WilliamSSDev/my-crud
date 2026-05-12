@@ -59,21 +59,18 @@ nav a:hover{
 
 /* CONTENT */
 
-.content{
-    padding: 40px;
-}
 
 /* CARDS */
 
-.cards-container{
+/* .cards-container{
     display: grid;
 
     grid-template-columns: repeat(3, 1fr);
 
-    gap: 10px;
+    gap: 15px;
 
-    margin-bottom: 700px;
-}
+    margin-bottom: 500px;
+} */
 
 .card{
     background-color: #1e293b;
@@ -111,6 +108,27 @@ nav a:hover{
 
     min-height: 100vh;
 } */
+
+.content{
+    display: flex;
+    justify-content: left;
+    align-items: flex-start;
+    padding: 40px;
+    padding-left: 40px;
+}
+
+.cards-container{
+    display: flex;
+
+    flex-direction: column;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 20px;
+
+    width: 700px;
+}
+
 
 .add-card-section{
     background-color: #1e293b;

@@ -8,7 +8,7 @@ user_route = APIRouter(prefix="/user", tags=['user'])
 @user_route.get(path="/me")
 async def get_user(usuario: User = Depends(verify_token)):
 
-    return {"message": usuario.id}
+    return {"user_info": usuario}
 
 @user_route.delete(path="/{user_id}")
 async def delete_user(user_id: int, session: Session = Depends(get_session), usuario: User = Depends(verify_token)):

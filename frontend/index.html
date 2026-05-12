@@ -50,7 +50,7 @@
 
             <div class="user-profile">
                 <i class="fa-solid fa-user"></i>
-                <span id="user-info">William</span>
+                <span id="user-info"></span>
             </div>
 
         </header>
@@ -76,6 +76,11 @@
                     <h3>Estatísticas</h3>
                 </div>
 
+                <div class="card" id="view-cards">
+                    <i class="fa-solid fa-chart-simple"></i>
+                    <h3>Ver cartas</h3>
+                </div>
+
             </section>
 
             <!-- ADD CARD -->
@@ -83,21 +88,25 @@
 
                 <h2>Adicionar Novo Cartão</h2>
 
-                <form>
+                <form id="card-form">
 
                     <label>Conteudo da frente</label>
                     <textarea
-                    placeholder="Digite a pergunta"></textarea>
+                        id="front-content"
+                        placeholder="Digite a pergunta"></textarea>
 
                     <label>Conteudo de trás</label>
                     <textarea
-                    placeholder="Digite a resposta"></textarea>
+                        id="back-content"
+                        placeholder="Digite a resposta"></textarea>
 
                     <label>Deck</label>
-                    <input type="text"
-                    placeholder="Nome do deck">
+                    <input
+                        id="deck-name"
+                        type="text"
+                        placeholder="Nome do deck">
 
-                    <button type="submit">
+                    <button type="submit" id="submit-button">
                         Salvar Carta
                     </button>
 

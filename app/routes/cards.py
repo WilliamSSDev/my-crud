@@ -11,7 +11,7 @@ cards_route = APIRouter(prefix="/cards", tags=['cards'])
 @cards_route.post(path="/add_card")
 def add_card(card: Card, usuario: User = Depends(verify_token), session: Session = Depends(get_session)):
 
-    # next_review = datetime.now(timezone.utc) + timedelta(days=2)
+    print(usuario.id)
 
     new_card = CardM(
         front_content=card.front_content,
@@ -32,7 +32,7 @@ def delete_cards(card_id, usuario: User = Depends(verify_token), session: Sessio
     found_card = session.query(CardM).filter_by(id=card_id).first()
 
     if not found_card:
-        return {"message": 'Card was not found'}
+        return HTTPException(404, 'Card was not found')
 
     elif not found_card.user_id:
         session.delete(found_card)
@@ -40,7 +40,7 @@ def delete_cards(card_id, usuario: User = Depends(verify_token), session: Sessio
         return {"message": 'Card has been deleted.'}
 
     elif found_card.user_id != usuario.id:
-        return {"message": 'Cant delete a card you do not own.'}
+        return HTTPException(403, 'Cant delete a card you do not own.')
 
     
     session.delete(found_card)
@@ -55,13 +55,13 @@ def pick_card(usuario: User = Depends(verify_token), session: Session = Depends(
     cards = session.query(CardM).filter_by(user_id=usuario.id).all()
 
     if not cards:
-        return {"message": "No cards were found"}
+        return HTTPException(404, detail='No cards were found')
     
     to_review = [card for card in cards if card.next_review <= datetime.utcnow()]
 
     if not to_review:
-        return {"message": "No cards to review found"}
-
+        return HTTPException(404, detail='No cards to review were found')
+    
     sorted_cards = sorted(to_review, key=lambda x: x.next_review)
 
     print(len(to_review), 'cards to review.')
@@ -74,19 +74,37 @@ def update_card(difficulty: Difficulty, card_id: int, usuario: User = Depends(ve
     card = session.query(CardM).filter_by(id=card_id).first()
 
     if not card:
-        return {"message": 'card was not found'}
+        return HTTPException(404, detail='Card was not found')
     
     elif card.user_id != usuario.id:
-        return {"message": 'Not allowed to do such operation.'}
+        return HTTPException(401, detail="Not authorized")
+        # return {"message": 'Not allowed to do such operation.'}
     
     next_review = get_next_review(difficulty)
     card.review_count += 1
     card.next_review = next_review
     card.difficulty = difficulty.value
 
+    if difficulty != Difficulty.EASY:
+        usuario.current_streak = 0
+    else:
+        usuario.current_streak += 1
+
     session.commit()
 
     return {"message": "card was updated."}
+
+@cards_route.get(path="/cards/{amount}")
+def get_cards(amount: int, usuario: User = Depends(verify_token),session: Session = Depends(get_session)):
+
+    cards = session.query(CardM).filter_by(user_id=usuario.id).all()
+
+    if not cards:
+        raise HTTPException(404, detail='No cards found')
+
+    return {"cards": cards[:amount]}
+
+
 
 
 

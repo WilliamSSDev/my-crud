@@ -1,59 +1,129 @@
-const URL = "http://127.0.0.1:8000/auth/login"
 
-async function handleLogin(event){
-    console.log("submit called");
-    event.preventDefault(); // stops page reload
-    let email = document.getElementById('fusername').value
-    let password = document.getElementById('fpassword').value
-
-    // Print to the console 
-
-    let response = await fetch(URL, {
-        method: "POST",
+async function get_user_info() {
+    const response = await fetch("http://localhost:8000/user/me", {
         credentials: "include",
+    })
+
+    const info = await response.json()
+
+    console.log(info)
+
+    return info
+}
+
+window.addEventListener("DOMContentLoaded", async function name(params) {
+
+    console.log("Window opened.")
+
+    const response = await fetch("http://localhost:8000/auth/protected", {
+        credentials: "include",
+        method: "POST"
+    })
+
+    const info = await response.json()
+
+    const authenticated = info.authenticated;
+
+    if (!authenticated){
+
+        window.location.href = "login_page.html"
+
+    }
+    const userInfo = document.getElementById("user-info");
+
+    const user = await get_user_info();
+
+    if (!user || !user.user_info.name){
+        console.log("User information wasnt loaded properly.")
+    } else {
+        userInfo.textContent = user.user_info.name;
+    }
+
+})
+
+const viewCardsButton = document.getElementById("view-cards")
+
+
+const addCardButton =
+    document.getElementById("open-add-card");
+
+const submitButton =
+    document.getElementById("submit-button");
+
+const addCardSection =
+    document.getElementById("add-card-section");
+
+let isCardWindowOpened = false;
+
+addCardButton.addEventListener("click", () => {
+
+    if (isCardWindowOpened){
+        isCardWindowOpened = false;
+        addCardSection.style.display = "none";
+    }
+    else{
+        isCardWindowOpened = true;
+        addCardSection.style.display = "table";
+    }
+    
+
+})
+
+async function add_card(front_content, back_content) {
+
+    const response = await fetch("http://localhost:8000/cards/add_card", {
+        credentials: "include",
+        method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            email: email,
-            password: password
+            front_content: front_content,
+            back_content: back_content
         })
-    });
-    let data = await response.json();
-    let message = document.getElementById('message');
+    })
 
-    if (response.status === 200)
-    {
-        console.log("You are now logged-in");
+    const result = await response.json();
 
-        let message = document.getElementById('message');
-        message.textContent = 'You are logged in';
+    console.log(result)
 
-        window.location.href = "login_page.html";
-
-        alert("Login successful")
-    } else {
-        
-        // let detail = data['detail']
-        console.log(response.status)
-        message.textContent = response.status
-
-        alert("Invalid credentials")
-    }
-
+    return result
     
 }
+submitButton.addEventListener("click", async () => {
 
+    event.preventDefault();
 
-const addCardButton =
-    document.getElementById("open-add-card")
+    let frontContent = document.getElementById("front-content");
+    let backContent = document.getElementById("back-content");
+    let deckName = document.getElementById("deck-name");
 
-const addCardSection =
-    document.getElementById("add-card-section")
+    console.log(frontContent.value);
 
-
-addCardButton.addEventListener("click", () => {
-
-    addCardSection.style.display = "block"
+    result = await add_card(frontContent.value, backContent.value);
 
 })
+
+viewCardsButton.addEventListener("click", async function() {
+
+    console.log("View cards clicked.");
+
+    const cards = await load_cards();
+
+    console.log(cards);
+    
+})
+
+async function load_cards() {
+
+    const response = await fetch("http://localhost:8000/cards/cards/10", {
+        credentials: "include"
+    })
+
+    const cards = await response.json();
+
+    // console.log(cards)
+
+    return cards
+
+}
