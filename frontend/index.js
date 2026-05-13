@@ -1,8 +1,85 @@
+// =========================
+// DOM ELEMENTS
+// =========================
 
-async function get_user_info() {
-    const response = await fetch("http://localhost:8000/user/me", {
+const userInfoElement = document.getElementById("user-info")
+
+const viewCardsButton =
+    document.getElementById("view-cards")
+
+const addCardButton =
+    document.getElementById("open-add-card")
+
+const submitButton =
+    document.getElementById("submit-button")
+
+const addCardSection =
+    document.getElementById("add-card-section")
+
+const frontContentInput =
+    document.getElementById("front-content")
+
+const backContentInput =
+    document.getElementById("back-content")
+
+const deckNameInput =
+    document.getElementById("deck-name")
+
+const viewCardsElement =
+    document.getElementById("view-cards")
+
+const tableBody =
+    document.getElementById("cards-table-body");
+
+const viewCardsWindow = document.getElementById("view-cards-window");
+
+
+
+
+
+// =========================
+// STATE
+// =========================
+
+let isCardWindowOpened = false
+let isViewCardWindowOpened = false
+
+
+// =========================
+// API HELPER
+// =========================
+
+async function apiFetch(url, options = {}) {
+
+    const response = await fetch(url, {
         credentials: "include",
+        ...options
     })
+
+    return response
+}
+
+async function viewCards(amount) {
+    const viewCardsUrl = `http://localhost:8000/cards/cards/${amount}`;
+    const cards = await apiFetch(viewCardsUrl);
+
+    const json_response = await cards.json()
+
+    return json_response;
+
+}
+
+
+// =========================
+// API FUNCTIONS
+// =========================
+
+
+// Return user info such as name, id, email, admin, current_streak...
+async function getUserInfo() {
+
+    const response =
+        await apiFetch("http://localhost:8000/user/me")
 
     const info = await response.json()
 
@@ -11,119 +88,240 @@ async function get_user_info() {
     return info
 }
 
-window.addEventListener("DOMContentLoaded", async function name(params) {
+// Call it when access_token gets expired.
+async function refreshToken() {
 
-    console.log("Window opened.")
+    const response = await apiFetch(
+        "http://localhost:8000/auth/refresh",
+        {
+            method: "POST"
+        }
+    )
 
-    const response = await fetch("http://localhost:8000/auth/protected", {
-        credentials: "include",
-        method: "POST"
-    })
+    const result = await response.json()
 
-    const info = await response.json()
-
-    const authenticated = info.authenticated;
-
-    if (!authenticated){
-
-        window.location.href = "login_page.html"
-
-    }
-    const userInfo = document.getElementById("user-info");
-
-    const user = await get_user_info();
-
-    if (!user || !user.user_info.name){
-        console.log("User information wasnt loaded properly.")
-    } else {
-        userInfo.textContent = user.user_info.name;
-    }
-
-})
-
-const viewCardsButton = document.getElementById("view-cards")
+    return result
+}
 
 
-const addCardButton =
-    document.getElementById("open-add-card");
+async function verifyAuthentication() {
 
-const submitButton =
-    document.getElementById("submit-button");
+    const response = await apiFetch(
+        "http://localhost:8000/auth/protected",
+        {
+            method: "POST"
+        }
+    )
 
-const addCardSection =
-    document.getElementById("add-card-section");
+    const authInfo = await response.json()
 
-let isCardWindowOpened = false;
+    return authInfo.authenticated
+}
 
-addCardButton.addEventListener("click", () => {
 
-    if (isCardWindowOpened){
-        isCardWindowOpened = false;
-        addCardSection.style.display = "none";
-    }
-    else{
-        isCardWindowOpened = true;
-        addCardSection.style.display = "table";
-    }
-    
+async function addCard(frontContent, backContent) {
 
-})
+    const response = await apiFetch(
+        "http://localhost:8000/cards/add_card",
+        {
+            method: "POST",
 
-async function add_card(front_content, back_content) {
+            headers: {
+                "Content-Type": "application/json"
+            },
 
-    const response = await fetch("http://localhost:8000/cards/add_card", {
-        credentials: "include",
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            front_content: front_content,
-            back_content: back_content
-        })
-    })
+            body: JSON.stringify({
+                front_content: frontContent,
+                back_content: backContent
+            })
+        }
+    )
 
-    const result = await response.json();
+    const result = await response.json()
 
     console.log(result)
 
     return result
-    
 }
-submitButton.addEventListener("click", async () => {
+
+// =========================
+// UI FUNCTIONS
+// =========================
+
+function toggleAddCardSection() {
+
+    isCardWindowOpened = !isCardWindowOpened;
+
+    if (isCardWindowOpened) {
+
+        isViewCardWindowOpened = false;
+
+        viewCardsWindow.style.display = "none";
+    }
+
+    addCardSection.style.display =
+        isCardWindowOpened ? "block" : "none";
+}
+
+function toggleViewCardsSection() {
+
+    isViewCardWindowOpened = !isViewCardWindowOpened;
+
+    if (isViewCardWindowOpened) {
+
+        isCardWindowOpened = false;
+
+        addCardSection.style.display = "none";
+    }
+
+    viewCardsWindow.style.display =
+        isViewCardWindowOpened ? "block" : "none";
+}
+
+
+async function updateUserUI() {
+
+    if (!userInfoElement) {
+        console.log("Element user-info does not exist.")
+        return
+    }
+
+    const user = await getUserInfo()
+
+    if (!user || !user.user_info || !user.user_info.name) {
+        console.log("User information wasn't loaded properly.")
+        return
+    }
+
+    userInfoElement.textContent =
+        user.user_info.name
+}
+
+
+// =========================
+// AUTH FLOW
+// =========================
+
+async function authenticateUser() {
+
+    let authenticated =
+        await verifyAuthentication()
+
+    if (authenticated) {
+        return true
+    }
+
+    console.log("Access token expired. Trying refresh...")
+
+    const refreshData = await refreshToken()
+
+    if (!refreshData.authenticated) {
+
+        console.log("Refresh failed.")
+
+        window.location.href =
+            "login_page.html"
+
+        return false
+    }
+
+    console.log("Token refreshed successfully.")
+
+    return true
+}
+
+
+// =========================
+// EVENT LISTENERS
+// =========================
+
+addCardButton.addEventListener("click", () => {
+
+    toggleAddCardSection()
+})
+
+
+submitButton.addEventListener("click", async (event) => {
 
     event.preventDefault();
 
-    let frontContent = document.getElementById("front-content");
-    let backContent = document.getElementById("back-content");
-    let deckName = document.getElementById("deck-name");
+    const frontContent =
+        frontContentInput.value.trim()
 
-    console.log(frontContent.value);
+    const backContent =
+        backContentInput.value.trim()
 
-    result = await add_card(frontContent.value, backContent.value);
+    const deckName =
+        deckNameInput.value.trim()
 
+    if (!frontContent || !backContent) {
+
+        console.log("Fields are empty.")
+
+        return
+    }
+
+    console.log("Adding card...")
+
+    const result =
+        await addCard(frontContent, backContent)
+
+    console.log(result)
+
+    // Optional cleanup
+
+    frontContentInput.value = ""
+    backContentInput.value = ""
 })
 
-viewCardsButton.addEventListener("click", async function() {
 
-    console.log("View cards clicked.");
+viewCardsButton.addEventListener("click", async () => {
 
-    const cards = await load_cards();
+    console.log("View cards clicked.")
 
-    console.log(cards);
-    
+    const isViewWindowOpened = await toggleViewCardsSection();
+
+    if (!isViewCardWindowOpened){
+        return
+    }
+
+    const cards = await viewCards(9999)
+
+    console.log("Cards: ", cards.cards);
+
+    tableBody.innerHTML = "";
+
+    const cardsArray = cards.cards
+
+    cardsArray.forEach(card => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+        <td>${card.id}</td>
+        <td>${card.front_content}</td>
+        <td>${card.back_content}</td>
+        `
+
+    tableBody.appendChild(row)
+    });
 })
 
-async function load_cards() {
 
-    const response = await fetch("http://localhost:8000/cards/cards/10", {
-        credentials: "include"
-    })
+// =========================
+// APP INITIALIZATION
+// =========================
 
-    const cards = await response.json();
+window.addEventListener("DOMContentLoaded", async () => {
 
-    // console.log(cards)
+    console.log("Window opened.")
 
-    return cards
 
-}
+    const authenticated =
+        await authenticateUser()
+
+    if (!authenticated) {
+        return
+    }
+
+    await updateUserUI()
+})

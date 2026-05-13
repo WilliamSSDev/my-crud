@@ -61,6 +61,14 @@ async def login(request: Request, response: Response, usuario: UserLogin, sessio
         samesite="Lax",  
         path="/"
     )
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        secure=False,      # for localhost only
+        samesite="Lax",  
+        path="/"
+    )
 
     return response
 
@@ -127,10 +135,8 @@ async def use_refresh_token(response: Response, request: Request, session = Depe
 
 
 @auth_route.post("/protected")
-async def protected(request: Request):
+async def protected(request: Request, usuario = Depends(verify_token)):
     token = request.cookies.get("access_token")
-
-    # print(token)
 
     if not token:
         return {"error": "not authenticated", "authenticated": False}

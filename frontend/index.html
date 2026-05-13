@@ -54,84 +54,116 @@
             </div>
 
         </header>
+            <!-- MAIN -->
+            <main class="content">
 
-        <!-- MAIN -->
-        <main class="content">
+                <!-- SIDEBAR -->
+                <section class="cards-container">
 
-            <!-- ACTION CARDS -->
-            <section class="cards-container">
+                    <div class="card" id="open-add-card">
+                        <i class="fa-solid fa-plus"></i>
+                        <h3>Adicionar Carta</h3>
+                    </div>
 
-                <div class="card" id="open-add-card">
-                    <i class="fa-solid fa-plus"></i>
-                    <h3>Adicionar Carta</h3>
+                    <div class="card" id="review-cards">
+                        <i class="fa-solid fa-book-open"></i>
+                        <h3>Revisar Cartas</h3>
+                    </div>
+
+                    <div class="card">
+                        <i class="fa-solid fa-chart-simple"></i>
+                        <h3>Estatísticas</h3>
+                    </div>
+
+                    <div class="card" id="view-cards">
+                        <i class="fa-solid fa-chart-simple"></i>
+                        <h3>Ver cartas</h3>
+                    </div>
+
+                </section>
+
+                <!-- RIGHT SIDE -->
+                <div class="main-content">
+
+                    <!-- VIEW CARDS -->
+                    <section class="view-cards-window" id="view-cards-window">
+
+                        <h2>Cartas</h2>
+
+                        <table class="cards-table-class" id="cards-table">
+
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Frente</th>
+                                    <th>Verso</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="cards-table-body">
+                            </tbody>
+
+                        </table>
+
+                    </section>
+
+                    <!-- ADD CARD -->
+                    <section class="add-card-section" id="add-card-section">
+
+                        <h2>Adicionar Novo Cartão</h2>
+
+                        <form id="card-form">
+
+                            <label>Conteudo da frente</label>
+
+                            <textarea
+                                id="front-content"
+                                placeholder="Digite a pergunta"
+                                required></textarea>
+
+                            <label>Conteudo de trás</label>
+
+                            <textarea
+                                id="back-content"
+                                placeholder="Digite a resposta"
+                                required></textarea>
+
+                            <label>Deck</label>
+
+                            <input
+                                id="deck-name"
+                                type="text"
+                                placeholder="Nome do deck"
+                                required>
+
+                            <button type="submit" id="submit-button">
+                                Salvar Carta
+                            </button>
+
+                        </form>
+
+                    </section>
+
+                    <!-- REVIEW -->
+                    <section class="review-section">
+
+                        <h2>Revisão</h2>
+
+                        <div class="review-card">
+
+                            <h3>O que é Python?</h3>
+
+                            <button>
+                                Mostrar Resposta
+                            </button>
+
+                        </div>
+
+                    </section>
+
                 </div>
 
-                <div class="card">
-                    <i class="fa-solid fa-book-open"></i>
-                    <h3>Revisar Cartas</h3>
-                </div>
-
-                <div class="card">
-                    <i class="fa-solid fa-chart-simple"></i>
-                    <h3>Estatísticas</h3>
-                </div>
-
-                <div class="card" id="view-cards">
-                    <i class="fa-solid fa-chart-simple"></i>
-                    <h3>Ver cartas</h3>
-                </div>
-
-            </section>
-
-            <!-- ADD CARD -->
-            <section class="add-card-section" id="add-card-section">
-
-                <h2>Adicionar Novo Cartão</h2>
-
-                <form id="card-form">
-
-                    <label>Conteudo da frente</label>
-                    <textarea
-                        id="front-content"
-                        placeholder="Digite a pergunta"></textarea>
-
-                    <label>Conteudo de trás</label>
-                    <textarea
-                        id="back-content"
-                        placeholder="Digite a resposta"></textarea>
-
-                    <label>Deck</label>
-                    <input
-                        id="deck-name"
-                        type="text"
-                        placeholder="Nome do deck">
-
-                    <button type="submit" id="submit-button">
-                        Salvar Carta
-                    </button>
-
-                </form>
-
-            </section>
-
-            <!-- REVIEW -->
-            <section class="review-section">
-
-                <h2>Revisão</h2>
-
-                <div class="review-card">
-
-                    <h3>O que é Python?</h3>
-
-                    <button>
-                        Mostrar Resposta
-                    </button>
-
-                </div>
-
-            </section>
-
-        </main>
+            </main>
 
     </div>
 
