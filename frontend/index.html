@@ -57,6 +57,8 @@
             <!-- MAIN -->
             <main class="content">
 
+                <h3 name="${card.id}" id="card-id"></h3>
+
                 <!-- SIDEBAR -->
                 <section class="cards-container">
 
@@ -105,6 +107,65 @@
 
                         </table>
 
+                        <div class="actions-bar">
+                            <button class="remove-all-cards" id="remove-all-cards">
+                                Remover Selecionados 
+                            </button>
+                        </div>
+
+                    </section>
+
+                    <!-- REVIEW CARDS -->
+                    <section class="review-section" id="review-section">
+
+                        <div class="review-card-container">
+
+                            <div class="review-front">
+
+                                <h3>Pergunta</h3>
+
+                                <p id="review-front-content">
+                                    O que é Python?
+                                </p>
+
+                            </div>
+
+                            <div class="review-back" id="review-back">
+
+                                <h3>Resposta</h3>
+
+                                <p id="review-back-content">
+                                    Python é uma linguagem de programação.
+                                </p>
+
+                            </div>
+
+                            <div class="review-actions">
+
+                                <button id="show-answer-button">
+                                    Mostrar Resposta
+                                </button>
+
+                            </div>
+
+                            <div class="difficulty-buttons" id="difficulty-buttons">
+
+                                <button class="easy-button">
+                                    Easy
+                                </button>
+
+                                <button class="medium-button">
+                                    Medium
+                                </button>
+
+                                <button class="hard-button">
+                                    Hard
+                                </button>
+
+                            </div>
+
+                        </div>
+
                     </section>
 
                     <!-- ADD CARD -->
@@ -141,23 +202,6 @@
                             </button>
 
                         </form>
-
-                    </section>
-
-                    <!-- REVIEW -->
-                    <section class="review-section">
-
-                        <h2>Revisão</h2>
-
-                        <div class="review-card">
-
-                            <h3>O que é Python?</h3>
-
-                            <button>
-                                Mostrar Resposta
-                            </button>
-
-                        </div>
 
                     </section>
 

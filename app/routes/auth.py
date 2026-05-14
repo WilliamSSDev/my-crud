@@ -129,7 +129,7 @@ async def use_refresh_token(response: Response, request: Request, session = Depe
 
     return {
         "access_token": access_token,
-        "message": f"{usuario.id} has been refreshed."
+        "authenticated": True
     }
 
 

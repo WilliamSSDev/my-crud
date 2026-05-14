@@ -10,6 +10,12 @@ const viewCardsButton =
 const addCardButton =
     document.getElementById("open-add-card")
 
+const reviewSection =
+    document.getElementById("review-section");
+
+const reviewCardsButton =
+    document.getElementById("review-cards");
+
 const submitButton =
     document.getElementById("submit-button")
 
@@ -33,8 +39,9 @@ const tableBody =
 
 const viewCardsWindow = document.getElementById("view-cards-window");
 
+const removeCards = document.getElementById("remove-all-cards")
 
-
+const answerButton = document.getElementById("show-answer-button")
 
 
 // =========================
@@ -43,6 +50,10 @@ const viewCardsWindow = document.getElementById("view-cards-window");
 
 let isCardWindowOpened = false
 let isViewCardWindowOpened = false
+let isRemoveButtonVisible = false
+let isReviewSectionOpened = false;
+let selectedCardsToRemove = []
+
 
 
 // =========================
@@ -63,17 +74,15 @@ async function viewCards(amount) {
     const viewCardsUrl = `http://localhost:8000/cards/cards/${amount}`;
     const cards = await apiFetch(viewCardsUrl);
 
-    const json_response = await cards.json()
+    const json_response = await cards.json();
 
     return json_response;
 
 }
 
-
 // =========================
 // API FUNCTIONS
 // =========================
-
 
 // Return user info such as name, id, email, admin, current_streak...
 async function getUserInfo() {
@@ -118,6 +127,30 @@ async function verifyAuthentication() {
     return authInfo.authenticated
 }
 
+async function deleteCard(cardId) {
+    const deleteCardsUrl = `http://localhost:8000/cards/delete_card/${cardId}`;
+    const response = await apiFetch(deleteCardsUrl, {method: "DELETE"});
+
+    const jsonResponse = await response.json();
+
+    return jsonResponse;
+
+}
+
+async function reviewCard(){
+    const pickCardUrl = "http://localhost:8000/cards/pick_card";
+    const response = await apiFetch(pickCardUrl)
+
+    const jsonResponse = await response.json();
+
+    const card = jsonResponse.card;
+
+    if (!card){
+        return null
+    }
+
+    return card
+}
 
 async function addCard(frontContent, backContent) {
 
@@ -148,34 +181,97 @@ async function addCard(frontContent, backContent) {
 // UI FUNCTIONS
 // =========================
 
+function toggleReviewSection() {
+
+    const shouldOpen =
+        !isReviewSectionOpened;
+
+    hideAllSections();
+
+    if (shouldOpen) {
+
+        reviewSection.style.display = "flex";
+
+        isReviewSectionOpened = true;
+
+    } else {
+
+        reviewSection.style.display = "none";
+
+        isReviewSectionOpened = false;
+    }
+}
+
+function toggleRemoveCardsButton() {
+
+    if (selectedCardsToRemove.length >= 1) {
+
+        removeCards.style.display = "flex";
+        removeCards.textContent = `Remover selecionados ${selectedCardsToRemove.length}`
+
+    } else {
+
+        removeCards.style.display = "none";
+    }
+}
+
+function hideAllSections() {
+
+    addCardSection.style.display = "none";
+
+    viewCardsWindow.style.display = "none";
+
+    reviewSection.style.display = "none";
+
+    isCardWindowOpened = false;
+
+    isViewCardWindowOpened = false;
+
+    isReviewSectionOpened = false;
+
+    resetSelectedCards();
+}
+
+function resetSelectedCards() {
+
+    selectedCardsToRemove = [];
+
+    toggleRemoveCardsButton();
+
+    document.querySelectorAll(".selected-row")
+        .forEach(row => {
+
+            row.classList.remove("selected-row");
+
+        });
+}
+
 function toggleAddCardSection() {
 
-    isCardWindowOpened = !isCardWindowOpened;
+    const shouldOpen = !isCardWindowOpened;
 
-    if (isCardWindowOpened) {
+    hideAllSections();
 
-        isViewCardWindowOpened = false;
+    if (shouldOpen) {
 
-        viewCardsWindow.style.display = "none";
+        addCardSection.style.display = "block";
+
+        isCardWindowOpened = true;
     }
-
-    addCardSection.style.display =
-        isCardWindowOpened ? "block" : "none";
 }
 
 function toggleViewCardsSection() {
 
-    isViewCardWindowOpened = !isViewCardWindowOpened;
+    const shouldOpen = !isViewCardWindowOpened;
 
-    if (isViewCardWindowOpened) {
+    hideAllSections();
 
-        isCardWindowOpened = false;
+    if (shouldOpen) {
 
-        addCardSection.style.display = "none";
+        viewCardsWindow.style.display = "block";
+
+        isViewCardWindowOpened = true;
     }
-
-    viewCardsWindow.style.display =
-        isViewCardWindowOpened ? "block" : "none";
 }
 
 
@@ -229,18 +325,42 @@ async function authenticateUser() {
 
     return true
 }
-
-
 // =========================
 // EVENT LISTENERS
 // =========================
+
+answerButton.addEventListener("click", () => {
+
+    const answerField = document.getElementById("review-back");
+
+    answerField.style.display = 'flex';
+
+});
+
+reviewCardsButton.addEventListener("click", () => {
+
+    toggleReviewSection();
+
+});
 
 addCardButton.addEventListener("click", () => {
 
     toggleAddCardSection()
 })
 
+removeCards.addEventListener("click", async () => {
 
+    for (const cardId of selectedCardsToRemove) {
+
+        await deleteCard(cardId);
+
+    }
+
+    selectedCardsToRemove = [];
+
+    toggleRemoveCardsButton();
+
+});
 submitButton.addEventListener("click", async (event) => {
 
     event.preventDefault();
@@ -279,6 +399,8 @@ viewCardsButton.addEventListener("click", async () => {
 
     console.log("View cards clicked.")
 
+    // await toggleRemoveCardsButton();
+
     const isViewWindowOpened = await toggleViewCardsSection();
 
     if (!isViewCardWindowOpened){
@@ -287,7 +409,9 @@ viewCardsButton.addEventListener("click", async () => {
 
     const cards = await viewCards(9999)
 
-    console.log("Cards: ", cards.cards);
+    if (!cards.cards){
+        return
+    }
 
     tableBody.innerHTML = "";
 
@@ -296,25 +420,87 @@ viewCardsButton.addEventListener("click", async () => {
     cardsArray.forEach(card => {
         const row = document.createElement("tr");
 
+        row.addEventListener("click", async () => {
+
+            let cardIdClicked =
+                row.querySelector(".card-id");
+
+            const cardId =
+                parseInt(cardIdClicked.textContent);
+
+            if (selectedCardsToRemove.includes(cardId)) {
+
+                selectedCardsToRemove =
+                    selectedCardsToRemove.filter(
+                        id => id !== cardId
+                    );
+
+                row.classList.remove("selected-row");
+
+                console.log("Removed:", cardId);
+
+            } else {
+
+                selectedCardsToRemove.push(cardId);
+
+                row.classList.add("selected-row");
+
+                console.log("Added:", cardId);
+            }
+
+            await toggleRemoveCardsButton();
+
+            console.log(selectedCardsToRemove);
+
+        });
+
         row.innerHTML = `
-        <td>${card.id}</td>
+        <td><h3 class="card-id">${card.id}</h3></td>
         <td>${card.front_content}</td>
         <td>${card.back_content}</td>
+        <td> 
+            <button type="button" class="delete-button">
+                🗑️
+            </button>
+        </td>
         `
 
+        const deleteButton = row.querySelector(".delete-button");
+
+        deleteButton.addEventListener("click", async (event) => {
+
+            event.preventDefault();
+
+            const confirmed = confirm(
+                "Tem certeza que deseja deletar esta carta?"
+            );
+
+            if (!confirmed) {
+                return;
+            }
+
+            console.log("Deleting card", card.id);
+
+            await deleteCard(card.id);
+
+            row.remove();
+
+        });
+
     tableBody.appendChild(row)
+
+
     });
 })
-
-
 // =========================
 // APP INITIALIZATION
 // =========================
 
 window.addEventListener("DOMContentLoaded", async () => {
 
-    console.log("Window opened.")
+    console.log("Site has been loaded.")
 
+    // tableBody.style.display = "none"
 
     const authenticated =
         await authenticateUser()
